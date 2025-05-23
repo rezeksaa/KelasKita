@@ -1,0 +1,116 @@
+import 'package:flutter/material.dart';
+
+class Assignment {
+  final String subject;
+  final String title;
+  final String detail;
+  final bool isFinished;
+
+  Assignment({
+    required this.subject,
+    required this.title,
+    required this.detail,
+    this.isFinished = false,
+  });
+}
+
+class AssignmentFragment extends StatelessWidget {
+  final List<Assignment> assignments = [
+    Assignment(
+      subject: 'Math',
+      title: 'Algebra Homework',
+      detail: 'Solve 10 algebra problems from page 42.',
+      isFinished: true,
+    ),
+    Assignment(
+      subject: 'Math',
+      title: 'Geometry Project',
+      detail: 'Create a model of a geometric shape.',
+      isFinished: false,
+    ),
+    Assignment(
+      subject: 'English',
+      title: 'Essay Writing',
+      detail: 'Write an essay about your favorite book.',
+      isFinished: false,
+    ),
+    Assignment(
+      subject: 'English',
+      title: 'Grammar Worksheet',
+      detail: 'Complete the grammar worksheet on tenses.',
+      isFinished: true,
+    ),
+  ];
+
+  String _getSubjectImage(String subject) {
+    switch (subject.toLowerCase()) {
+      case 'math':
+        return 'assets/Math.png';
+      case 'english':
+        return 'assets/english.png';
+      default:
+        return '';
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final Map<String, List<Assignment>> grouped = {};
+    for (var assignment in assignments) {
+      grouped.putIfAbsent(assignment.subject, () => []).add(assignment);
+    }
+
+    return Scaffold(
+      backgroundColor: Colors.white,
+      body: ListView(
+        padding: const EdgeInsets.all(12.0),
+        children: grouped.entries.map((entry) {
+          return Card(
+            margin: const EdgeInsets.symmetric(vertical: 8.0),
+            elevation: 3,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                if (entry.key.toLowerCase() == 'math' || entry.key.toLowerCase() == 'english')
+                  Padding(
+                    padding: const EdgeInsets.only(top: 16.0, bottom: 8.0),
+                    child: SizedBox(
+                      height: 180,
+                      child: Image.asset(
+                        _getSubjectImage(entry.key),
+                        fit: BoxFit.cover,
+                        width: double.infinity,
+                      ),
+                    ),
+                  ),
+                ExpansionTile(
+                  title: Text(entry.key, style: TextStyle(fontWeight: FontWeight.bold)),
+                  children: entry.value.map((assignment) {
+                    return ExpansionTile(
+                      title: Row(
+                        children: [
+                          Expanded(child: Text(assignment.title)),
+                          Icon(
+                            assignment.isFinished ? Icons.check_circle : Icons.radio_button_unchecked,
+                            color: assignment.isFinished ? Colors.green : Colors.grey,
+                            size: 20,
+                          ),
+                        ],
+                      ),
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.all(16.0),
+                          child: Text(assignment.detail),
+                        ),
+                      ],
+                    );
+                  }).toList(),
+                ),
+              ],
+            ),
+          );
+        }).toList(),
+      ),
+    );
+  }
+}
